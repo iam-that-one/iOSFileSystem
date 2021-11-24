@@ -12,7 +12,7 @@ class ViewController: UIViewController {
     var folders : [String] = []
     var selectedFolder = ""
   
-    lazy var foldeCreation : UIButton = {
+    lazy var foldeCreationBtn : UIButton = {
       $0.translatesAutoresizingMaskIntoConstraints = false
       $0.backgroundColor = UIColor.blue
       $0.setTitle("Create Folder", for: .normal)
@@ -22,7 +22,7 @@ class ViewController: UIViewController {
       return $0
       }(UIButton(type: .system))
     
-    lazy var fileCreation : UIButton = {
+    lazy var fileCreationBtn : UIButton = {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.backgroundColor = UIColor.blue
         $0.setTitle("Create file", for: .normal)
@@ -32,18 +32,17 @@ class ViewController: UIViewController {
         return $0
       }(UIButton(type: .system))
     
-    lazy var fileContent : UITextField = {
+    lazy var fileContentTf : UITextField = {
         $0.borderStyle = .roundedRect
         $0.translatesAutoresizingMaskIntoConstraints = false
         return $0
       }(UITextField())
     
-    lazy var folderFileName : UITextField = {
+    lazy var folderFileNameTf : UITextField = {
         $0.borderStyle = .roundedRect
         $0.translatesAutoresizingMaskIntoConstraints = false
         return $0
       }(UITextField())
-    
     
     lazy var tableView : UITableView = {
         $0.delegate = self
@@ -51,7 +50,6 @@ class ViewController: UIViewController {
         $0.layer.cornerRadius = 5
         $0.backgroundColor = .darkGray
         $0.translatesAutoresizingMaskIntoConstraints = false
-
         return $0
       }(UITableView())
 
@@ -63,27 +61,27 @@ class ViewController: UIViewController {
     }
 
     func uiPreferences(){
-        [folderFileName,foldeCreation,fileCreation,tableView,fileContent].forEach{view.addSubview($0)}
+        [folderFileNameTf,foldeCreationBtn,fileCreationBtn,tableView,fileContentTf].forEach{view.addSubview($0)}
      
         NSLayoutConstraint.activate([
-            folderFileName.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            folderFileName.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20),
-            folderFileName.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20),
+            folderFileNameTf.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            folderFileNameTf.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20),
+            folderFileNameTf.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20),
+            
+            foldeCreationBtn.topAnchor.constraint(equalTo: folderFileNameTf.bottomAnchor, constant: 10),
+            foldeCreationBtn.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20),
+            foldeCreationBtn.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20),
+            
+            fileCreationBtn.topAnchor.constraint(equalTo: foldeCreationBtn.bottomAnchor, constant: 10),
+            fileCreationBtn.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20),
+            
+            fileCreationBtn.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20),
 
-            foldeCreation.topAnchor.constraint(equalTo: folderFileName.bottomAnchor, constant: 10),
-            foldeCreation.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20),
-            foldeCreation.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20),
+            fileContentTf.topAnchor.constraint(equalTo: fileCreationBtn.bottomAnchor,constant: 10),
+            fileContentTf.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            fileContentTf.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            fileCreation.topAnchor.constraint(equalTo: foldeCreation.bottomAnchor, constant: 10),
-            fileCreation.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20),
-            
-            fileCreation.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20),
-
-            fileContent.topAnchor.constraint(equalTo: fileCreation.bottomAnchor,constant: 10),
-            fileContent.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            fileContent.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            
-            tableView.topAnchor.constraint(equalTo: fileContent.bottomAnchor,constant: 10),
+            tableView.topAnchor.constraint(equalTo: fileContentTf.bottomAnchor,constant: 10),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20),
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -60)
@@ -93,15 +91,15 @@ class ViewController: UIViewController {
     func createFile(){
         let fileManager = FileManager.default
         let directiryUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
-        let fileName = directiryUrl?.appendingPathComponent(selectedFolder).appendingPathComponent(folderFileName.text! + ".swift")
-        let data = fileContent.text?.data(using: .utf8)
+        let fileName = directiryUrl?.appendingPathComponent(selectedFolder).appendingPathComponent(folderFileNameTf.text! + ".swift")
+        let data = fileContentTf.text?.data(using: .utf8)
         fileManager.createFile(atPath: fileName!.path, contents: data, attributes: nil)
     }
     func createFolder(){
-        if folderFileName.text != ""{
+        if folderFileNameTf.text != ""{
         let fileManager = FileManager.default
         let dirUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
-        let dir = dirUrl?.appendingPathComponent(folderFileName.text!)
+        let dir = dirUrl?.appendingPathComponent(folderFileNameTf.text!)
         do{
             let folders = try fileManager.contentsOfDirectory(atPath: dirUrl!.path)
             try fileManager.createDirectory(at: dir!, withIntermediateDirectories: true, attributes: nil)
