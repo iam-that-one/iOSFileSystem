@@ -11,86 +11,89 @@ class ViewController: UIViewController {
 
     var folders : [String] = []
     var selectedFolder = ""
-    var color : UIColor = .darkGray
-    var textColor : UIColor = .white
-    let folderFileName = UITextField()
-    let tableView = UITableView(frame: .null, style: .insetGrouped)
-    let fileContent = UITextField()
-    let foldeCreation = UIButton()
-    let fileCreation = UIButton()
+  
+    lazy var foldeCreation : UIButton = {
+      $0.translatesAutoresizingMaskIntoConstraints = false
+      $0.backgroundColor = UIColor.blue
+      $0.setTitle("Create Folder", for: .normal)
+      $0.setTitleColor(.white, for: .normal)
+      $0.layer.cornerRadius = 10
+      $0.addTarget(self, action: #selector(createFolderBtnClick), for: .touchDown)
+      return $0
+      }(UIButton(type: .system))
+    
+    lazy var fileCreation : UIButton = {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.backgroundColor = UIColor.blue
+        $0.setTitle("Create file", for: .normal)
+        $0.setTitleColor(.white, for: .normal)
+        $0.layer.cornerRadius = 10
+        $0.addTarget(self, action: #selector(createFileBtnClick), for: .touchDown)
+        return $0
+      }(UIButton(type: .system))
+    
+    lazy var fileContent : UITextField = {
+        $0.borderStyle = .roundedRect
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        return $0
+      }(UITextField())
+    
+    lazy var folderFileName : UITextField = {
+        $0.borderStyle = .roundedRect
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        return $0
+      }(UITextField())
+    
+    
+    lazy var tableView : UITableView = {
+        $0.delegate = self
+        $0.dataSource = self
+        $0.layer.cornerRadius = 5
+        $0.backgroundColor = .darkGray
+        $0.translatesAutoresizingMaskIntoConstraints = false
+
+        return $0
+      }(UITableView())
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .orange
         fetchData()
-        setup()
+        uiPreferences()
     }
 
-    func setup(){
-        // Add subViews to the main view
+    func uiPreferences(){
         [folderFileName,foldeCreation,fileCreation,tableView,fileContent].forEach{view.addSubview($0)}
-        
-        // Set textField configrations
-        folderFileName.borderStyle = .roundedRect
-        folderFileName.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Set textField constraints
-        folderFileName.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20).isActive = true
-        folderFileName.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20).isActive = true
-        folderFileName.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20).isActive = true
+     
+        NSLayoutConstraint.activate([
+            folderFileName.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            folderFileName.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20),
+            folderFileName.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20),
 
-       // Set button1 configration
-        foldeCreation.translatesAutoresizingMaskIntoConstraints = false
-        foldeCreation.backgroundColor = UIColor.blue
-        foldeCreation.setTitle("Create Folder", for: .normal)
-        foldeCreation.setTitleColor(.white, for: .normal)
-        foldeCreation.addTarget(self, action: #selector(createFolderBtnClick), for: .touchDown)
-        
-        // Set button1 constraints
-        foldeCreation.topAnchor.constraint(equalTo: folderFileName.bottomAnchor, constant: 10).isActive = true
-        foldeCreation.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20).isActive = true
-        foldeCreation.layer.cornerRadius = 10
-        foldeCreation.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20).isActive = true
+            foldeCreation.topAnchor.constraint(equalTo: folderFileName.bottomAnchor, constant: 10),
+            foldeCreation.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20),
+            foldeCreation.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20),
+            
+            fileCreation.topAnchor.constraint(equalTo: foldeCreation.bottomAnchor, constant: 10),
+            fileCreation.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20),
+            
+            fileCreation.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20),
 
-        // Set button2 configration
-        fileCreation.translatesAutoresizingMaskIntoConstraints = false
-        fileCreation.backgroundColor = UIColor.blue
-        fileCreation.setTitle("Create file", for: .normal)
-        fileCreation.setTitleColor(.white, for: .normal)
-        fileCreation.addTarget(self, action: #selector(createFileBtnClick), for: .touchDown)
-        
-        // Set button1 constraints
-        fileCreation.topAnchor.constraint(equalTo: foldeCreation.bottomAnchor, constant: 10).isActive = true
-        fileCreation.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20).isActive = true
-        fileCreation.layer.cornerRadius = 10
-        fileCreation.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20).isActive = true
-
-        // Set textView configration
-        fileContent.borderStyle = .roundedRect
-        fileContent.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Set textView constraints
-        fileContent.topAnchor.constraint(equalTo: fileCreation.bottomAnchor,constant: 10).isActive = true
-        fileContent.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
-        fileContent.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
-        
-        // Set tableView constraints
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.topAnchor.constraint(equalTo: fileContent.bottomAnchor,constant: 10).isActive = true
-        tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20).isActive = true
-        tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20).isActive = true
-        tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -60).isActive = true
-        
-        // Set tableView configrations
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.layer.cornerRadius = 5
-        tableView.backgroundColor = .darkGray
+            fileContent.topAnchor.constraint(equalTo: fileCreation.bottomAnchor,constant: 10),
+            fileContent.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            fileContent.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
+            tableView.topAnchor.constraint(equalTo: fileContent.bottomAnchor,constant: 10),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -60)
+        ])
+   
     }
     func createFile(){
         let fileManager = FileManager.default
-        let dirUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
-        let fileName = dirUrl?.appendingPathComponent(selectedFolder).appendingPathComponent(folderFileName.text! + ".swift")
+        let directiryUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
+        let fileName = directiryUrl?.appendingPathComponent(selectedFolder).appendingPathComponent(folderFileName.text! + ".swift")
         let data = fileContent.text?.data(using: .utf8)
         fileManager.createFile(atPath: fileName!.path, contents: data, attributes: nil)
     }
@@ -120,11 +123,11 @@ class ViewController: UIViewController {
     }
     func fetchData(){
         let fileManager = FileManager.default
-        let dirUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
+        let directoryUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
         do{
-            let folders = try fileManager.contentsOfDirectory(atPath: dirUrl!.path)
+            let folders = try fileManager.contentsOfDirectory(atPath: directoryUrl!.path)
             for folder in folders{
-                let selectedFolders = dirUrl?.appendingPathComponent(folder)
+                let selectedFolders = directoryUrl?.appendingPathComponent(folder)
                 if selectedFolders?.hasDirectoryPath == true{
                     self.folders.append(folder)
                 }
@@ -153,14 +156,12 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource{
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
         cell.textLabel?.text = folders[indexPath.row]
-        cell.backgroundColor = color
-        cell.textLabel?.textColor = textColor
+        cell.backgroundColor = .darkGray
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         self.selectedFolder = folders[indexPath.row]
-        color = .black
         print(selectedFolder)
     }
 }
